@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunset Scan Center</title>
+</head>
+<body>
+
+    <h1>Welcome to Sunset Scan Center!</h1>
+
+    <div id="verificationForm">
+        <div id="step1">
+            <label for="productType">Select Product Type:</label>
+            <select id="productType">
+                <option value="1">Drugs</option>
+                <option value="2">Sachet water</option>
+                <option value="3">Can Foods</option>
+                <option value="4">Bottle Water and Drinks</option>
+            </select>
+            <button onclick="nextStep(2)">Next</button>
+        </div>
+
+        <div id="step2" style="display: none;">
+            <label for="phoneNumber">Enter Phone Number:</label>
+            <input type="text" id="phoneNumber" placeholder="Enter your phone number">
+            <button onclick="nextStep(3)">Next</button>
+        </div>
+
+        <div id="step3" style="display: none;">
+            <label for="fdaPin">Enter FDA PIN:</label>
+            <input type="text" id="fdaPin" placeholder="Enter FDA PIN">
+            <button onclick="verifyProduct()">Verify Product</button>
+        </div>
+
+        <div id="verificationResult"></div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function nextStep(nextStep) {
+            document.getElementById(`step${currentStep}`).style.display = 'none';
+            currentStep = nextStep;
+            document.getElementById(`step${currentStep}`).style.display = 'block';
+        }
+
+        function verifyProduct() {
+            const productType = document.getElementById('productType').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const fdaPin = document.getElementById('fdaPin').value;
+
+            const postData = {
+                product_type: productType,
+                phone_number: phoneNumber,
+                product_fda_pin: fdaPin
+            };
+
+            fetch("https://your-api-endpoint/verify-product", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.createElement('div');
+                resultElement.innerText = data.result || data.error || "Unknown error";
+                document.getElementById('verificationResult').appendChild(resultElement);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    </script>
+
+</body>
+</html>
